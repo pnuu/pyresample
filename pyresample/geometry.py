@@ -525,20 +525,14 @@ class SwathDefinition(CoordinateDefinition):
     def _compute_omerc_parameters(self, ellipsoid):
         """Compute the oblique mercator projection bouding box parameters."""
         lines, cols = self.lons.shape
-        lon1, lon2 = np.asanyarray(self.lons[[0, -1], int(cols / 2)])
-        lat1, lat, lat2 = np.asanyarray(
+        lon1, lonc, lon2 = np.asanyarray(self.lons[[0, int(lines / 2), -1], int(cols / 2)])
+        lat1, lat0, lat2 = np.asanyarray(
             self.lats[[0, int(lines / 2), -1], int(cols / 2)])
 
-        proj_dict2points = {'proj': 'omerc', 'lat_0': lat, 'ellps': ellipsoid,
-                            'lat_1': lat1, 'lon_1': lon1,
-                            'lat_2': lat2, 'lon_2': lon2, 'no_rot': True}
-
-        # return proj_dict2points
         # We need to compute alpha-based omerc for geotiff support
-        lonc, lat0 = Proj(**proj_dict2points)(0, 0, inverse=True)
-        az1, az2, dist = Geod(**proj_dict2points).inv(lonc, lat0, lon2, lat2)
+        az1, az2, dist = Geod(ellps=ellipsoid).inv(lonc, lat0, lon2, lat2)
         azimuth = az1
-        az1, az2, dist = Geod(**proj_dict2points).inv(lonc, lat0, lon1, lat1)
+        az1, az2, dist = Geod(ellps=ellipsoid).inv(lonc, lat0, lon1, lat1)
         if abs(az1 - azimuth) > 1:
             if abs(az2 - azimuth) > 1:
                 logger.warning("Can't find appropriate azimuth.")
@@ -554,7 +548,8 @@ class SwathDefinition(CoordinateDefinition):
 
         prj_params = {'proj': 'omerc', 'alpha': float(azimuth),
                       'lat_0': float(lat0),  'lonc': float(lonc),
-                      'no_rot': True, 'ellps': ellipsoid}
+                      'no_rot': True,
+                      'ellps': ellipsoid}
 
         return prj_params
 
