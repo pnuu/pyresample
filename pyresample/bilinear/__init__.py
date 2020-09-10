@@ -446,6 +446,10 @@ class BilinearBase(object):
         """Load bilinear resampling look-up tables and initialize the resampler."""
         raise NotImplementedError
 
+    def resample(self, data, fill_value=None, nprocs=1):
+        """Resample the given data."""
+        raise NotImplementedError
+
 
 def _check_fill_value(fill_value, dtype):
     """Check that fill value is usable for the data."""
@@ -882,6 +886,15 @@ class NumpyResamplerBilinear(BilinearBase):
         res = np.squeeze(res)
 
         return res
+
+    def resample(self, data, fill_value=0, nprocs=1):
+        """Resample the given data."""
+        if nprocs > 1:
+            from pyresample._spatial_mp import cKDTree_MP as kdtree_class
+        else:
+            kdtree_class = KDTree
+        self.get_bil_info(kdtree_class=kdtree_class, nprocs=nprocs)
+        return self.get_sample_from_bil_info(data, fill_value=fill_value, output_shape=None)
 
 
 def _apply_fill_value_or_mask_data(result, fill_value):

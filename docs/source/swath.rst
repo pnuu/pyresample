@@ -295,8 +295,7 @@ XArrayResamplerBilinear
 >>> lats = da.from_array(np.fromfunction(lambda y, x: 75 - y * 0.1, (500, 100)))
 >>> source_def = geometry.SwathDefinition(lons=lons, lats=lats)
 >>> resampler = XArrayResamplerBilinear(source_def, target_def, 30e3)
->>> resampler.get_bil_info()
->>> result = resampler.get_sample_from_bil_info(data)
+>>> result = resampler.resample(data)
 
 
 NumpyResamplerBilinear
@@ -323,8 +322,7 @@ NumpyResamplerBilinear
 >>> lats = np.fromfunction(lambda y, x: 75 - y * 0.1, (500, 100))
 >>> source_def = geometry.SwathDefinition(lons=lons, lats=lats)
 >>> resampler = NumpyResamplerBilinear(source_def, target_def, 30e3)
->>> resampler.get_bil_info()
->>> result = resampler.get_sample_from_bil_info(data)
+>>> result = resampler.resample(data)
 
 
 
@@ -336,7 +334,8 @@ Convenience function for resampling using bilinear interpolation for irregular s
 .. note::
 
   The use of this function is deprecated. Depending on the input data format, please use directly
-  the **bilinear.NumpyResamplerBilinear** or **bilinear.XArrayResamplerBilinear** classes shown above.
+  the **bilinear.NumpyResamplerBilinear** or **bilinear.XArrayResamplerBilinear** classes and their
+  **.resample()** method shown above.
 
 .. doctest::
 

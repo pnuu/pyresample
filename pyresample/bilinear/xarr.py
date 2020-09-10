@@ -163,6 +163,12 @@ class XArrayResamplerBilinear(BilinearBase):
 
         return da.compute(valid_input_index, input_coords)
 
+    def resample(self, data, fill_value=None, nprocs=1):
+        """Resample the given data."""
+        del nprocs
+        self.get_bil_info()
+        return self.get_sample_from_bil_info(data, fill_value=fill_value, output_shape=None)
+
 
 def _get_output_xy(target_geo_def):
     out_x, out_y = target_geo_def.get_proj_coords(chunks=CHUNK_SIZE)
