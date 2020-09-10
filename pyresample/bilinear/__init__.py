@@ -77,11 +77,6 @@ def resample_bilinear(data, source_geo_def, target_area_def, radius=50e3,
         Source data resampled to target geometry
 
     """
-    if nprocs > 1:
-        from pyresample._spatial_mp import cKDTree_MP as kdtree_class
-    else:
-        kdtree_class = KDTree
-
     # Deprecation warning is suppressed outside __main__ by default, so use FutureWarning
     warnings.warn(
         "Usage of resample_bilinear() is deprecated, please use NumpyResamplerBilinear class instead",
@@ -95,10 +90,7 @@ def resample_bilinear(data, source_geo_def, target_area_def, radius=50e3,
         epsilon=epsilon,
         reduce_data=reduce_data
     )
-    resampler.get_bil_info(kdtree_class=kdtree_class, nprocs=nprocs)
-    result = resampler.get_sample_from_bil_info(data, fill_value=fill_value, output_shape=None)
-
-    return result
+    return resampler.resample(data, fill_value=fill_value, nprocs=nprocs)
 
 
 def get_sample_from_bil_info(data, t__, s__, input_idxs, idx_arr,
